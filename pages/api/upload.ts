@@ -23,7 +23,8 @@ type Payload = {
   is_protective: boolean,
   is_fast_learner: boolean,
   is_athletic: boolean,
-  is_graceful: boolean
+  is_graceful: boolean,
+  dog_id?: any
 }
 
 type PredictedBreed = { value: number, label: string }
@@ -57,6 +58,7 @@ const predict = async (req: NowRequest, res: NowResponse) => {
 
   let predictionPayload: Payload = {
     height: req.body.height,
+    dog_id: null,
     image_path: splitPayloadFromImgDataUri(req.body.image),
     is_friendly: req.body.is_friendly || false,
     is_playful: req.body.is_playful || false,
@@ -68,6 +70,23 @@ const predict = async (req: NowRequest, res: NowResponse) => {
 
   try{
     let allPredictions: PredictedBreed[] = []
+
+    // let predResponse = await got.post(endpointFromDeploymentId(selectedDeployments[0]), {
+    //       headers: {
+    //         "Authorization": `Bearer ${API_KEY}`,
+    //         "datarobot-key": DATAROBOT_KEY
+    //       },
+    //       json: [predictionPayload],
+    //       responseType: 'json'
+    // }) 
+
+    // console.log(predResponse.body)
+    // console.log(predResponse.statusCode)
+
+    // @ts-ignore
+    // let predictionValues = predResponse.body.data[0].predictionValues
+    // allPredictions.push(...predictionValues)
+    // console.log(predResponse.body)
 
     let predictionResponses = selectedDeployments
       .map(async deploymentId => 
@@ -82,7 +101,7 @@ const predict = async (req: NowRequest, res: NowResponse) => {
       )
 
       for (const predictionResponse of predictionResponses) {
-        
+
         //@ts-ignore
         let predictionValues = (await predictionResponse).body.data[0].predictionValues
         allPredictions.push(...predictionValues)
@@ -100,17 +119,23 @@ const predict = async (req: NowRequest, res: NowResponse) => {
           ...breedDescriptions[prediction.label]
         })
       }
-
       console.log(out)
       res.send(out)
    }
    catch(error) {
-     console.log(error)
+    console.log("ERROR MAKING PREDICTIONS")
+     if(error instanceof got.HTTPError){
+       console.log("HTTP ERROR")
+       console.log(error.message)
+       console.log(error.response.body) 
+     }
+     res.status(500).send("An error occurred making the request") 
    }
 }
 
 export default (req: NowRequest, res: NowResponse) => {
   if (req.method === 'POST' && req.body) {
+    console.log("REQUEST RECEIVED")
     predict(req, res)
   }
   else {

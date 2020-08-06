@@ -84,10 +84,20 @@ const Index: React.FC = () => {
       },
       body: JSON.stringify(payload) // body data type must match "Content-Type" header
     });
-    let breeds = await response.json()
 
+    console.log("got response")
+    console.log(response.status)
     setShowProgress(false)
-    setBreedPredictions(breeds)
+
+    if(response.status === 200){
+      let breeds = await response.json()
+      setBreedPredictions(breeds)
+    }
+    else{
+      console.error("Error making predictions")
+      console.error(response.status)
+    }
+
   }
 
   const [showProgress, setShowProgress] = useState(true)
