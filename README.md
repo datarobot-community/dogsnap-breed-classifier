@@ -16,6 +16,11 @@ Project was bootstrapped using [Nitro](https://github.com/williamluke4/Nitro).
 - DataRobot account. You can request a free trial at https://datarobot.com/lp/trial.
 - Vercel account with Vercel CLI set up (for deployment and API) - [https://vercel.com](vercel.com)
 
+### Deploy the models
+
+The training datasets are included and located in `datasets` directory. There are 5 of them, labeled `x-small` to `x-large` - based on dog weight. 
+To use, you need to train and deploy all 5 models with DataRobot and use their deployment IDs in the environment variables (see steps below).
+
 ### Install and Run Dev Server
 
 - Set up environment variables
