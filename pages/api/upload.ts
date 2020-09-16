@@ -11,9 +11,8 @@ const deployments = {
   x_large: process.env.DEPLOYMENT_04_XLARGE || "",
 }
 
-const PREDICTION_SERVER = process.env.PREDICTION_SERVER
+const DATAROBOT_URL = process.env.DATAROBOT_URL
 const API_KEY = process.env.API_KEY
-const DATAROBOT_KEY = process.env.DATAROBOT_KEY
 
 type Payload = {
   height: string,
@@ -31,7 +30,7 @@ type PredictedBreed = { value: number, label: string }
 const splitPayloadFromImgDataUri = (dataUri: string) => {
   return dataUri.split(',')[1]
 }
-const endpointFromDeploymentId = (deploymentId: string) => `${PREDICTION_SERVER}/predApi/v1.0/deployments/${deploymentId}/predictions`
+const endpointFromDeploymentId = (deploymentId: string) => `${DATAROBOT_URL}/api/v2/deployments/${deploymentId}/predictions`
 
 const topValues = (breeds: PredictedBreed[], number = 5) => {
     breeds.sort( (first, second) => second.value - first.value)
@@ -74,7 +73,6 @@ const predict = async (req: NowRequest, res: NowResponse) => {
         await got.post(endpointFromDeploymentId(deploymentId), {
           headers: {
             "Authorization": `Bearer ${API_KEY}`,
-            "datarobot-key": DATAROBOT_KEY
           },
           json: [predictionPayload],
           responseType: 'json'
@@ -117,4 +115,3 @@ export default (req: NowRequest, res: NowResponse) => {
     res.status(400).send("Invalid request")
   }
 }
-
